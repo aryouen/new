@@ -1,0 +1,51 @@
+*Create a new user named alice 
+*create a directory names public_html inside /home/alice/public_html
+
+*Apply the correct permissions on the user home and public_html directories
+# chmod 711 /home/alice
+# chown alice:alice /home/alice/public_html
+# chmod 755 /home/alice/public_html
+
+Also, set correct SELinux context for Apache homedirs (httpd_enable_homedirs)
+# setsebool -P httpd_enable_homedirs true
+# chcon -R -t httpd_sys_content_t /home/alice/public_html
+
+*inside public_html directory create an index.html file with following content 
+<html>
+  <head>
+    <title>Arun k</title>
+  </head>
+  <body>
+    <h1>hello world</h1>
+  </body>
+</html>
+
+*save and exit
+*now goto /etc/httpd/conf.d and vim this file /userdir.conf and 
+enabel  UserDir enabled line by removing # and add the user name
+UserDir enabled alice (this is how the entry look like) (change diasble to enable)
+
+enable UserDir line and add public_html dir here
+UserDir public_html (this is how the entry look like)
+add your index.html files path here <Directory "/home/alice/public_html">
+
+*now goto /etc/httpd/conf/httpd.conf and add the below entries (this step is not madatory)
+
+NameVirtualHost *:80
+<VirtualHost *:80>
+DocumentRoot /home/alice/public_html
+ServerName www.myfirstwebsite.test
+</VirtualHost>
+
+now restart the httpd service 
+#systemctl restart httpd 
+
+add the webaddress along with the public ip of the instance in /etc/hosts file
+3.93.186.137 www.myfirstwebsite.test
+
+save and exit
+
+curl <the ip or websddrs>
+if the output is shown properly try pasting the public ip in webrowser (incase not working try incognito mode)
+
+
